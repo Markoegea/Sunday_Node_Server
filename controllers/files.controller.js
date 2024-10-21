@@ -3,10 +3,9 @@ const { readSingleFile, readMultipleFiles } = require('../handler/read.file.hand
 const { updateMutipleFiles, updateSingleFile } = require('../handler/update.file.handler');
 const { deleteMutipleFiles, deleteSingleFile } = require('../handler/delete.file.handler');
 
-//TODO: Avoid to use the 'files/' substring, the client send it
 const readFile = (req, res) => {
     const {location} = req.params;
-    readSingleFile(location.replace("&","/"), res);
+    readSingleFile(location.replaceAll("&","/"), res);
 };
 
 const readAllFile = (req, res) => {
@@ -56,7 +55,6 @@ const updateFile = (req, res) => {
 };
 
 const deleteFile = (req, res) => {
-
     if (!req.body) {
         res.status(404).json("No body send to the request");
         return;
@@ -68,10 +66,10 @@ const deleteFile = (req, res) => {
     }
 
     if (typeof req.body.location === 'string') {
-        deleteSingleFile('files/'+req.body.location, res);
+        deleteSingleFile(req.body.location, res);
     } else {
         const locations = req.body.location.map((location) => 
-            'files/'+location
+            location
         );
         deleteMutipleFiles(locations, res);
     }

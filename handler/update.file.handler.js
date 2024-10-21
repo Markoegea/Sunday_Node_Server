@@ -21,9 +21,9 @@ const updateMutipleFiles = (data, response) => {
     });
 
     Promise.all(updateTaskPromises).then((storageRef, metadata) => {
-        response.status(201).json({message : `Files ${storageRef.map((files) => files.name)} has been updated successfully.`});
+        response.status(201).json({"message" : `Files ${storageRef.map((files) => files.name)} has been updated successfully.`});
     }, (error) => {
-        response.status(501).json({error : error});
+        response.status(501).json({"error" : error});
     });
 }
 
@@ -32,10 +32,10 @@ const updateSingleFile = (data, response) => {
     const storageRef = ref(firebaseApp.storage, `files/${newMetadata.name}`);
     updateFile(storageRef, newMetadata,
         (storageRef, metadata) => {
-            response.status(201).json({message : `File ${storageRef.name} has been updated successfully.`});
+            response.status(201).json({"message" : `File ${storageRef.name} has been updated successfully.`});
         },
         (error) => {
-            response.status(501).json({error : error});
+            response.status(501).json({"error" : error});
         }
     );
 }

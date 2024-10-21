@@ -21,9 +21,9 @@ const createMutipleFiles = (data, response) => {
     });
 
     Promise.all(uploadTaskPromises).then((downloadURL) => {
-        response.status(201).json({urls : downloadURL});
+        response.status(201).json({"urls" : downloadURL});
     }, (error) => {
-        response.status(501).json({error : error});
+        response.status(501).json({"error" : error});
     });
 }
 
@@ -34,10 +34,10 @@ const createSingleFile = (data, response) => {
     const uploadTask = uploadBytesResumable(storageRef, file.data, file.metadata);
     uploadFile(uploadTask,
         (downloadURL) => {
-            response.status(201).json({urls : downloadURL});
+            response.status(201).json({"urls" : downloadURL});
         },
         (error) => {
-            response.status(501).json({error : error});
+            response.status(501).json({"error" : error});
         }
     );
 }
