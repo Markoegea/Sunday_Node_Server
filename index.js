@@ -12,7 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:4321"
+        origin: ""
     }
 }); // Handling CORS
 
@@ -33,9 +33,9 @@ server.listen(port, () => {
 // Entry point
 app.get('/', (req, res) => {
     try {
-        res.status(200).json({response: 'You are in the entry point'});
+        res.status(200).json({"message": 'You are in the entry point'});
     } catch {
-        res.status(500).json({message: error.message});
+        res.status(500).json({"error": error.message});
     }
 });
 

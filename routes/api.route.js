@@ -3,7 +3,7 @@ const api = express.Router();
 const fileRouter = require("./files.route");
 
 api.get('/', ((req, res) => {
-    res.status(201).json({response : 'You are in the api Router'});
+    res.status(201).json({"message" : 'You are in the api Router'});
 }))
 
 api.use('/files', fileRouter);
