@@ -28,7 +28,7 @@ const createMutipleFiles = (data, response) => {
 }
 
 const createSingleFile = (data, response) => {
-    const file = createMetadata(rawData, Metadata.UPLOAD);
+    const file = createMetadata(data, Metadata.UPLOAD);
 
     const storageRef = ref(firebaseApp.storage, `files/${file.metadata.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file.data, file.metadata);
