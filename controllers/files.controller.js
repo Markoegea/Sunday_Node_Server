@@ -13,24 +13,43 @@ const readAllFile = (req, res) => {
 }
 
 const uploadFile = (req, res) => {
-    if (!("files" in req)) {
-        return;
+
+    function handleCreateFile(fileObject) {
+    
+        if (!("files" in fileObject)) {
+            res.status(404).json({"error" : "No File Uploaded"});
+            return;
+        }
+    
+        if (req.body.length > 1) {
+            createMutipleFiles(fileObject.files, res);
+        } else {
+            createSingleFile(fileObject.files, res);
+        }
     }
 
-    if (!req.files) {
-        res.status(404).json("No File Uploaded");
-        return;
+    if (!("version" in req.body)) {
+        res.status(404).json({"error" : "No version reported."})
     }
 
-    if (!("files" in req.files)) {
-        return;
-    }
+    if (req.body.version === "web") {
+        if (!("files" in req)) {
+            res.status(404).json({"error" : "No File Uploaded"});
+            return;
+        }
+        handleCreateFile(req.files);
 
-    if (req.body.length > 1) {
-        createMutipleFiles(req.files.files, res);
+    } else if (req.body.version === "android") {
+        if (!("files" in req.body)) {
+            res.status(404).json({"error" : "No File Uploaded"});
+            return;
+        }
+        handleCreateFile(req.body);
     } else {
-        createSingleFile(req.files.files, res);
+        res.status(404).json({"error" : "No version available"});
     }
+
+
 };
 
 const updateFile = (req, res) => {

@@ -1,6 +1,6 @@
 const { errorHandler } = require("./error.handler");
 const { firebaseApp } = require("../firebase/init.firebase");
-const { ref, getDownloadURL, uploadBytesResumable} = require("firebase/storage");
+const { ref, getDownloadURL, uploadBytesResumable, uploadString} = require("firebase/storage");
 const { createMetadata, Metadata } = require("../auxiliar/metadata.aux");
 
 const createMutipleFiles = (data, response) => {
@@ -13,9 +13,8 @@ const createMutipleFiles = (data, response) => {
 
     files.map((file) => {
         const storageRef = ref(firebaseApp.storage, `files/${file.metadata.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, file.data, file.metadata);
         const uploadTaskPromise = new Promise((resolve, reject) => {
-            uploadFile(uploadTask, resolve, reject);
+            uploadFile(storageRef, file.data, file.metadata, resolve, reject);
         });
         uploadTaskPromises.push(uploadTaskPromise);
     });
@@ -31,8 +30,7 @@ const createSingleFile = (data, response) => {
     const file = createMetadata(data, Metadata.UPLOAD);
 
     const storageRef = ref(firebaseApp.storage, `files/${file.metadata.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file.data, file.metadata);
-    uploadFile(uploadTask,
+    uploadFile(storageRef, file.data, file.metadata,
         (downloadURL) => {
             response.status(201).json({"urls" : downloadURL});
         },
@@ -42,8 +40,15 @@ const createSingleFile = (data, response) => {
     );
 }
 
-function uploadFile(uploadTask, resolve, reject) {
-    uploadTask.on(
+function uploadFile(storageRef, data, metadata, resolve, reject) {
+    let uploadPromise; 
+    if (metadata.contentEncoding  === "base64") {
+        uploadPromise = uploadString(storageRef, data, metadata.contentEncoding, metadata);
+    } else {
+        uploadPromise = uploadBytesResumable(storageRef, data, metadata);
+    }
+    
+    uploadPromise.on(
         "state_changed",
         (snapshot) => {
             const progress = Math.round(
@@ -61,6 +66,7 @@ function uploadFile(uploadTask, resolve, reject) {
             });
         }
     );
+    return uploadPromise;
 }
 
 module.exports = {
