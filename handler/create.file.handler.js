@@ -1,7 +1,9 @@
 const { errorHandler } = require("./error.handler");
 const { firebaseApp } = require("../firebase/init.firebase");
-const { ref, getDownloadURL, uploadBytesResumable, uploadString} = require("firebase/storage");
+const { ref } = require("firebase/storage");
 const { createMetadata, Metadata } = require("../auxiliar/metadata.aux");
+const { ByteEncoding } = require("./create_chain/byteEncoding.file.chain");
+const { Base64Encoding } = require("./create_chain/base64Encoding.file.chain");
 
 const createMutipleFiles = (data, response) => {
     const files = [];
@@ -41,32 +43,8 @@ const createSingleFile = (data, response) => {
 }
 
 function uploadFile(storageRef, data, metadata, resolve, reject) {
-    let uploadPromise; 
-    if (metadata.contentEncoding  === "base64") {
-        uploadPromise = uploadString(storageRef, data, metadata.contentEncoding, metadata);
-    } else {
-        uploadPromise = uploadBytesResumable(storageRef, data, metadata);
-    }
-    
-    uploadPromise.on(
-        "state_changed",
-        (snapshot) => {
-            const progress = Math.round(
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            );
-            console.log(progress);
-        },
-        (error) => {
-            errorHandler(error);
-            reject(error);
-        },
-        () => {
-            getDownloadURL(uploadPromise.snapshot.ref).then((downloadURL) => {
-                resolve(downloadURL);
-            });
-        }
-    );
-    return uploadPromise;
+    const uploadChain = new Base64Encoding().setNextHandler(new ByteEncoding());
+    uploadChain.handle(storageRef, data, metadata, resolve, reject);
 }
 
 module.exports = {
