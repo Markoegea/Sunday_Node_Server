@@ -61,7 +61,7 @@ function uploadFile(storageRef, data, metadata, resolve, reject) {
             reject(error);
         },
         () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            getDownloadURL(uploadPromise.snapshot.ref).then((downloadURL) => {
                 resolve(downloadURL);
             });
         }
