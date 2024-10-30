@@ -28,6 +28,11 @@ const uploadFile = (req, res) => {
         }
     }
 
+    if (!("length" in req.body)) {
+        res.status(404).json("No length of files provided");
+        return;
+    }
+
     if (!("version" in req.body)) {
         res.status(404).json({"error" : "No version reported."})
     }
@@ -54,33 +59,45 @@ const uploadFile = (req, res) => {
 
 const updateFile = (req, res) => {
     if (!req.body) {
-        res.status(404).json("No body send to the request");
+        res.status(404).json({"error" : "No body send to the request"});
         return;
     }
 
     if (!("modify" in req.body)) {
-        res.status(404).json("No data provided to modify");
+        res.status(404).json({"error" : "No data provided to modify"});
         return;
     }
 
-    if (typeof req.body.modify === 'string') {
-        updateSingleFile(JSON.parse(req.body.modify), res);
-    } else {
+    if (!("length" in req.body)) {
+        res.status(404).json({"error" : "No length of files provided"});
+        return;
+    }
+
+    function parseData(rawMetadata) {
+        if (typeof rawMetadata === 'string') {
+            return JSON.parse(rawMetadata);
+        }
+        return rawMetadata;
+    }
+
+    if (req.body.length > 1) {
         const filesToModify = req.body.modify.map((newMetadata) => 
-            JSON.parse(newMetadata)
+            parseData(newMetadata)
         )
         updateMutipleFiles(filesToModify, res);
+    } else {
+        updateSingleFile(parseData(req.body.modify), res);
     }
 };
 
 const deleteFile = (req, res) => {
     if (!req.body) {
-        res.status(404).json("No body send to the request");
+        res.status(404).json({"error" : "No body send to the request"});
         return;
     }
 
     if (!("location" in req.body)) {
-        res.status(404).json("No File Selected to Delete");
+        res.status(404).json({"error" : "No File Selected to Delete"});
         return;
     }
 
