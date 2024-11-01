@@ -13,7 +13,7 @@ const deleteMutipleFiles = (locations, response) => {
     });
 
     Promise.all(deleteTaskPromises).then((message) => {
-        response.status(201).json({'message' : message});
+        response.status(201).json({'delete' : message});
     }, (error) => {
         response.status(501).json({"error" : error});
     });
@@ -22,7 +22,7 @@ const deleteMutipleFiles = (locations, response) => {
 const deleteSingleFile = (location, response) => {
     deleteFileTask(location,
         (message) => {
-            response.status(201).json({'message' : message});
+            response.status(201).json({'delete' : message});
         },
         (error) => {
             response.status(501).json({"error" : error});

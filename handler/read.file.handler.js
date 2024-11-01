@@ -10,7 +10,7 @@ const readSingleFile = (location, response) => {
         response.status(201).json({"metadata" : metadata});
     }).catch((_) => {
         listFiles(fileRef, false).then((directory) => {
-            response.status(201).json({"directory" : directory});
+            response.status(201).json({"read" : directory});
         }).catch((error) => {
             response.status(201).json({"error" : error});
         });
@@ -21,7 +21,7 @@ const readMultipleFiles = (response) => {
     const fileRef = ref(firebaseApp.storage);
 
     listFiles(fileRef).then((directory) => {
-        response.status(201).json({"directory" : directory});
+        response.status(201).json({"read" : directory});
     }).catch((error) => {
         response.status(201).json({"error" : error});
     });

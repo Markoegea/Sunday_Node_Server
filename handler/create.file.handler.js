@@ -22,7 +22,7 @@ const createMutipleFiles = (data, response) => {
     });
 
     Promise.all(uploadTaskPromises).then((downloadURL) => {
-        response.status(201).json({"urls" : downloadURL});
+        response.status(201).json({"create" : downloadURL});
     }, (error) => {
         response.status(501).json({"error" : error});
     });
@@ -34,7 +34,7 @@ const createSingleFile = (data, response) => {
     const storageRef = ref(firebaseApp.storage, `files/${file.metadata.name}`);
     uploadFile(storageRef, file.data, file.metadata,
         (downloadURL) => {
-            response.status(201).json({"urls" : downloadURL});
+            response.status(201).json({"create" : downloadURL});
         },
         (error) => {
             response.status(501).json({"error" : error});
