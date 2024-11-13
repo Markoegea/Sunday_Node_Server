@@ -53,9 +53,8 @@ function listFiles(locationRef, deepSearch=true) {
                 if (deepSearch) {
                     const subFolder = await listFiles(folderRef);
                     Object.assign(directory, subFolder);
-                } else {
-                    subDirectory.push(folderRef.fullPath);
                 }
+                subDirectory.push(folderRef.name);
             }
         
             directory[locationRef.fullPath] = subDirectory;
