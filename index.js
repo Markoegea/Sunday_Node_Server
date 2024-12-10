@@ -17,7 +17,7 @@ const io = new Server(server, {
 }); // Handling CORS
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '500gb' }));
 app.use(express.urlencoded({extended: false}));
 app.use(fileupload());
 app.use(cors()); // Allows incoming request from any IP

@@ -39,28 +39,48 @@ function listFiles(locationRef, deepSearch=true) {
     async function listFilesPromise(locationRef, deepSearch, resolve, reject) {
         try {
             const directory = {};
-            const subDirectory = [];
+            const subDirectory = {};
             
             const directoryList = await listAll(locationRef);
-            directoryList.items.forEach((itemRef) => {
+
+            const linksPromises = []
+            for (let i = 0; i < directoryList.items.length; i++) {
+                const itemRef = directoryList.items[i];
+
                 // All the items under listRef.
-                subDirectory.push(itemRef.name);
-            });
+                linksPromises.push(
+                    new Promise (async (resolve) => {
+                        subDirectory[itemRef.name] = await getDownloadURL(itemRef);
+                        resolve();
+                    })
+                )
+            } 
         
+            const subFolderPromises = [];
             // All folders under listRef.
             for (let i = 0; i < directoryList.prefixes.length; i++) {
                 const folderRef = directoryList.prefixes[i];
                 if (deepSearch) {
-                    const subFolder = await listFiles(folderRef);
-                    Object.assign(directory, subFolder);
+                    subFolderPromises.push (
+                        new Promise( async (resolve) => { 
+                            const subFolder = await listFiles(folderRef);
+                            Object.assign(subDirectory, subFolder);
+                            resolve();
+                        })
+                    );
+                    continue;
                 }
-                subDirectory.push(folderRef.name);
+                subDirectory[folderRef.name] = {};
             }
         
+            
+            
+            await Promise.all(linksPromises);
+            await Promise.all(subFolderPromises);
             directory[locationRef.fullPath] = subDirectory;
             resolve(directory);
         } catch (error) {
-            reject(error)
+            reject(error.toString());
         }
     }
     return new Promise((resolve, reject) => listFilesPromise(locationRef, deepSearch, resolve, reject));
